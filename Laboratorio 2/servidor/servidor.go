@@ -56,8 +56,10 @@ func handleConnection(conn net.Conn) {
     }
     message := string(buffer[:n])
 
-    // Parsear mensaje del cliente
+
+    // Descompone el mensaje del cliente en una Lista
     parts := strings.Split(message, ":")
+
     if len(parts) != 3 {
         fmt.Println("Mensaje del cliente con formato incorrecto:", message)
         return
@@ -69,6 +71,8 @@ func handleConnection(conn net.Conn) {
         return
     }
     captain := parts[2]
+
+	fmt.Printf("Recepción de solicitud desde el Planeta %s, del capitan %s\n", planetName, captain)
 
     // Asignar botín al planeta adecuado
     assignBooty(planetName, booty, captain)
@@ -87,6 +91,8 @@ func assignBooty(planetName string, booty int, captain string) {
         if booty < minBooty {
             minBooty = booty
             targetPlanet = name
+
+			fmt.Printf("Botín asignado al Planeta %s, cantidad actual: %d\n", targetPlanet, minBooty)
         }
     }
     mutex.Lock()

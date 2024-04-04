@@ -3,6 +3,7 @@ package main
 import (    
 	"fmt"
 	"net"
+    "strings"
 )
 
 type Planet struct {
@@ -12,7 +13,7 @@ type Planet struct {
 }
 
 func main() {
-    planet := "A"
+    planet := "Pluton"
     booty := 10
     captain := "C1"
 
@@ -30,6 +31,12 @@ func sendRequest(message string) {
 
     // Enviar mensaje al servidor
     _, err = conn.Write([]byte(message))
+
+	parts := strings.Split(message, ":")
+	captain := parts[2]
+	planetName := parts[0]
+	fmt.Printf("Capitán %s encontró botín en Planeta %s, enviando solicitud de asignación...\n", captain, planetName)
+
     if err != nil {
         fmt.Println("Error al enviar el mensaje:", err)
         return

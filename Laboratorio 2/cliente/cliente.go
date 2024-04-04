@@ -1,43 +1,49 @@
-package cliente
+package main
 
-import (
-    "bytes"
-    "encoding/json"
-    "fmt"
-    "math/rand"
-    "net/http"
-    "strings"
-    "time"
+import (    
+	"fmt"
+	"net"
 )
 
 type Planet struct {
-    Name   string `json:"name"`
-    Booty  int    `json:"booty"`
-    Captain string `json:"captain"`
+	Name    string 
+	Booty   int    
+	Captain string 
 }
 
 func main() {
-    planet := Planet{Name: "", Booty: 10, Captain: "C1"} // Ejemplo de solicitud de botín
-    sendRequest(planet)
+    planet := "A"
+    booty := 10
+    captain := "C1"
+
+    message := fmt.Sprintf("%s:%d:%s", planet, booty, captain)
+    sendRequest(message)
 }
 
-func sendRequest(planet Planet) {
-    url := "http://localhost:8080/assign-booty"
-    jsonValue, _ := json.Marshal(planet)
-    response, err := http.Post(url, "application/json", bytes.NewBuffer(jsonValue))
+func sendRequest(message string) {
+    conn, err := net.Dial("tcp", "localhost:8080")
     if err != nil {
-        fmt.Println("Error al enviar solicitud:", err)
+        fmt.Println("Error al conectar con el servidor:", err)
         return
     }
-    defer response.Body.Close()
+    defer conn.Close()
+
+    // Enviar mensaje al servidor
+    _, err = conn.Write([]byte(message))
+    if err != nil {
+        fmt.Println("Error al enviar el mensaje:", err)
+        return
+    }
 
     // Leer respuesta del servidor
-    var result string
-    if response.StatusCode == http.StatusOK {
-        fmt.Println("Solicitud exitosa.")
-        fmt.Println("Respuesta del servidor:")
-        _, _ = fmt.Scanln(&result)
-    } else {
-        fmt.Println("Error:", response.Status)
+    buffer := make([]byte, 1024)
+    n, err := conn.Read(buffer)
+    if err != nil {
+        fmt.Println("Error al leer la respuesta del servidor:", err)
+        return
     }
+    response := string(buffer[:n])
+
+    // Imprimir respuesta del servidor
+    fmt.Println("Respuesta del servidor:", response)
 }

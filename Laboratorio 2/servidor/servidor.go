@@ -1,63 +1,84 @@
-package servidor
+package main
 
 import (
-    "encoding/json"
     "fmt"
-    "math/rand"
-    "net/http"
+    "net"
+    "strconv"
+    "strings"
     "sync"
-    "time"
 )
 
 type Planet struct {
-    Name   string `json:"name"`
-    Booty  int    `json:"booty"`
-    Captain string `json:"captain"`
+	Name    string 
+	Booty   int    
+	Captain string 
 }
 
 var planets = make(map[string]int)
 var mutex sync.Mutex
 
 func main() {
-    initializePlanets()
-    http.HandleFunc("/assign-booty", handleAssignBooty)
-    fmt.Println("Servidor en ejecución en el puerto 8080...")
-    http.ListenAndServe(":8080", nil)
+	initializePlanets()
+	ln, err := net.Listen("tcp", ":8080")
+	if err != nil {
+		fmt.Println("Error al iniciar el servidor:", err)
+		return
+	}
+	defer ln.Close()
+	fmt.Println("Servidor en ejecución en el puerto 8080...")
+	for {
+		conn, err := ln.Accept()
+		if err != nil {
+			fmt.Println("Error al aceptar la conexión:", err)
+			continue
+		}
+		go handleConnection(conn)
+	}
 }
 
 func initializePlanets() {
-    // Inicializar planetas con botines aleatorios
-    rand.Seed(time.Now().UnixNano())
-    for i := 0; i < 6; i++ {
-        planetName := string('A' + i)
-        planets[planetName] = rand.Intn(10)
-    }
+	// Inicializar planetas con botines aleatorios
+	for i := 0; i < 6; i++ {
+		planetName := string('A' + i)
+		planets[planetName] = 0 // Inicialmente, ningún botín asignado
+	}
 }
 
-func handleAssignBooty(w http.ResponseWriter, r *http.Request) {
-    // Parsear la solicitud del cliente
-    var planet Planet
-    err := json.NewDecoder(r.Body).Decode(&planet)
+func handleConnection(conn net.Conn) {
+    defer conn.Close()
+
+    // Leer mensaje del cliente
+    buffer := make([]byte, 1024)
+    n, err := conn.Read(buffer)
     if err != nil {
-        http.Error(w, err.Error(), http.StatusBadRequest)
+        fmt.Println("Error al leer el mensaje del cliente:", err)
         return
     }
+    message := string(buffer[:n])
+
+    // Parsear mensaje del cliente
+    parts := strings.Split(message, ":")
+    if len(parts) != 3 {
+        fmt.Println("Mensaje del cliente con formato incorrecto:", message)
+        return
+    }
+    planetName := parts[0]
+    booty, err := strconv.Atoi(parts[1])
+    if err != nil {
+        fmt.Println("Error al convertir botín a entero:", err)
+        return
+    }
+    captain := parts[2]
 
     // Asignar botín al planeta adecuado
-    assignBooty(&planet)
-
-    // Actualizar registro de botines asignados
-    mutex.Lock()
-    defer mutex.Unlock()
-    planets[planet.Name] += planet.Booty
+    assignBooty(planetName, booty, captain)
 
     // Responder al cliente con el planeta asignado
-    response := fmt.Sprintf("Botín asignado a planeta %s para capitán %s", planet.Name, planet.Captain)
-    w.WriteHeader(http.StatusOK)
-    w.Write([]byte(response))
+    response := fmt.Sprintf("Botín asignado a planeta %s para capitán %s\n", planetName, captain)
+    conn.Write([]byte(response))
 }
 
-func assignBooty(planet *Planet) {
+func assignBooty(planetName string, booty int, captain string) {
     // Lógica para asignar botín al planeta adecuado
     // (en este caso, simplemente se asigna al planeta con menos botines)
     minBooty := 9999
@@ -68,5 +89,7 @@ func assignBooty(planet *Planet) {
             targetPlanet = name
         }
     }
-    planet.Name = targetPlanet
+    mutex.Lock()
+    defer mutex.Unlock()
+    planets[targetPlanet] += booty
 }

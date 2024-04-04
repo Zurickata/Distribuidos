@@ -1,0 +1,18 @@
+Integrates:
+    Felipe Guicharrousse Rojas
+    Rodrigo Ramirez Catrileo
+    Ignacio Riquelme Vidal
+
+Grupo 7
+
+
+Ejecucion: 
+    Para ejecutar correctamente el programa 
+
+    En linux ejecutar
+        make docker
+    Para levantar el docker que contiene el servidor
+
+    y luego ejecute
+        make capitanes
+    Inicia el codigo de los capitanes

@@ -17,7 +17,7 @@ type Planet struct {
 
 func main() {
 	// Definir el número máximo de iteraciones
-	maxIterations := 2
+	maxIterations := 5
 
 	// Definir el rango de datos aleatorios para el botín
 	minBooty := 1

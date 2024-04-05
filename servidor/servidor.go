@@ -40,7 +40,6 @@ func main() {
 
 func initializePlanets() {
 	// Inicializar planetas con botines aleatorios
-
 	rand.Seed(time.Now().UnixNano())
 
 	for i := 0; i < 6; i++ {
@@ -81,7 +80,7 @@ func handleConnection(conn net.Conn) {
 	fmt.Printf("Recepción de solicitud desde el Planeta %s, del capitan %s\n", planetName, captain)
 
 	// Asignar botín al planeta adecuado
-	assignBooty(planetName, booty, captain)
+	assignBooty(booty)
 
 	// Mostrar estado actual de las asignaciones de los planetas
 	printPlanetStatus()
@@ -91,7 +90,7 @@ func handleConnection(conn net.Conn) {
 	conn.Write([]byte(response))
 }
 
-func assignBooty(planetName string, booty int, captain string) {
+func assignBooty(booty int) {
 	// Lógica para asignar botín al planeta adecuado
 	// (en este caso, simplemente se asigna al planeta con menos botines)
 	minBooty := 9999

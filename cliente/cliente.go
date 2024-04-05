@@ -16,10 +16,10 @@ type Planet struct {
 }
 
 func main() {
-	// Definir el número máximo de iteraciones y el intervalo de tiempo entre solicitudes
+	// Definir el número máximo de iteraciones
 	maxIterations := 2
 
-	// Definir el rango específico para los datos aleatorios
+	// Definir el rango de datos aleatorios para el botín
 	minBooty := 1
 	maxBooty := 20
 
@@ -36,14 +36,12 @@ func main() {
 		message := fmt.Sprintf("%s:%d:%s", planet, booty, captain)
 		sendRequest(message)
 
-		// Generar un intervalo aleatorio entre 2 y 7 segundos
+		// Generar un intervalo aleatorio entre 2 y 7 segundos para enviar solicitudes
 		interval := time.Duration(rand.Intn(6)+2) * time.Second
-		
+
 		// Esperar el intervalo de tiempo antes de enviar la próxima solicitud
 		time.Sleep(interval)
 	}
-
-	// En teoría deberían salir la solicitudes de manera aleatoria, no de forma secuencial cada "interval" de tiempo.
 }
 
 func sendRequest(message string) {
@@ -66,16 +64,4 @@ func sendRequest(message string) {
 		fmt.Println("Error al enviar el mensaje:", err)
 		return
 	}
-
-	// Leer respuesta del servidor
-	buffer := make([]byte, 1024)
-	n, err := conn.Read(buffer)
-	if err != nil {
-		fmt.Println("Error al leer la respuesta del servidor:", err)
-		return
-	}
-	response := string(buffer[:n])
-
-	// Imprimir respuesta del servidor
-	fmt.Println("Respuesta del servidor:", response)
 }

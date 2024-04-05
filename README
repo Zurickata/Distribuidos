@@ -9,10 +9,20 @@ Grupo 7
 Ejecucion: 
     Para ejecutar correctamente el programa 
 
-    En linux ejecutar
+    En linux ejecutar:
         make docker
     Para levantar el docker que contiene el servidor
 
-    y luego ejecute
+    y luego ejecute:
         make capitanes
     Inicia el codigo de los capitanes
+
+    En Windows se deben ubicar en la carpeta Raiz y ejecutar:
+        docker-compose build
+	    docker-compose up
+    Para levantar el docker que contiene el servidor
+
+    y para ejecutar el cliente:    
+        cd cliente
+        go run cliente.go
+    Y se iniciará el código de los capitanes
